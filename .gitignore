@@ -1,0 +1,10 @@
+# fetched results (keep tests/expected/ tracked)
+results/
+# fields and meshes are large and regenerable
+*.vtu
+*.pvtu
+*.pvd
+*.msh
+paraview/
+__pycache__/
+*.pyc
