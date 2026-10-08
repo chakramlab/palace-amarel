@@ -7,7 +7,7 @@ for %%I in ("%REPO%") do set REPO=%%~fI
 echo Uploading %REPO% to amarel:/scratch/$USER/GitHub/palace-amarel ...
 ssh amarel "mkdir -p /scratch/$USER/GitHub /scratch/$USER/logs" || goto :fail
 scp -r -q "%REPO%" amarel:/scratch/$USER/GitHub/ || goto :fail
-ssh amarel "cd /scratch/$USER/GitHub/palace-amarel && sed -i 's/$//' cluster/*.sh cluster/*.sbatch cluster/*.slurm tests/*.sh tests/*.py && chmod +x cluster/*.sh tests/*.sh && nohup bash cluster/spack_bootstrap.sh > /scratch/$USER/logs/spack_bootstrap.log 2>&1 < /dev/null & disown; echo started" || goto :fail
+ssh amarel "cd /scratch/$USER/GitHub/palace-amarel && sed -i 's/\r$//' cluster/*.sh cluster/*.sbatch cluster/*.slurm tests/*.sh tests/*.py && chmod +x cluster/*.sh tests/*.sh && nohup bash cluster/spack_bootstrap.sh > /scratch/$USER/logs/spack_bootstrap.log 2>&1 < /dev/null & disown; echo started" || goto :fail
 echo Phase A started on the login node (about 10 minutes). Log: /scratch/$USER/logs/spack_bootstrap.log
 echo When it says "bootstrap done", run 03_submit_build.bat
 pause
