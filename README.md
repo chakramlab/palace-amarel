@@ -43,15 +43,45 @@ Contents
 
 ## 2. Before you start
 
-You need:
+This README is deliberately the only document in this repo; everything you need is in it.
 
-1. **An Amarel account** (your NetID). Request one through OARC (Office of Advanced Research
-   Computing), https://oarc.rutgers.edu. Support: help@oarc.rutgers.edu.
-2. **The Rutgers VPN** (Cisco AnyConnect). `amarel.rutgers.edu` only resolves through the DNS the
-   VPN provides. If your laptop says *Could not resolve hostname* while the rest of the internet
-   works, the VPN has dropped; nothing on the cluster is wrong. `windows\00_check_vpn.bat` tests
-   exactly this.
-3. **An SSH key and a host alias.** `windows\01_setup_ssh.ps1` creates a key if you have none, adds
+### 2.1 Getting an Amarel account (one-time; allow a few days)
+
+Amarel is run by OARC (Office of Advanced Research Computing, part of Rutgers IT). Any Rutgers
+researcher, graduate students included, can get a free general-access account; sponsored outside
+collaborators can too. General-access jobs run on pooled nodes and can be preempted by the nodes'
+owners, which is why the job template uses `--requeue`. Links verified 2026-10-08:
+
+| what | where |
+|---|---|
+| Request an account (NetID login; the form asks for your PI as sponsor) | https://it.rutgers.edu/research-computing/amarel-cluster-access-request/ |
+| What Amarel is, ownership model, cost of owned nodes | https://it.rutgers.edu/research-computing/resources/amarel/ |
+| Official user guide (NetID login required) | https://it.rutgers.edu/research-computing/amarel-user-guide/ |
+| FAQ | https://it.rutgers.edu/research-computing/research-computing-faqs/#amarel-faq |
+| System status (maintenance, outages) | https://it.rutgers.edu/research-computing/amarel-system-status/ |
+| Help: email, phone, ticket portal | help@oarc.rutgers.edu, 848-445-5227, https://ithelp.rutgers.edu/sp |
+| Training, consultation, workshops | https://it.rutgers.edu/research-computing/training-and-scientific-consultation/ |
+| Acceptable-use policy (read it once) | https://rutgers.app.box.com/v/oarc-systems-mgmt-aup |
+
+Steps: (1) make sure your NetID works and Rutgers two-step login (Duo) is set up, since every
+Rutgers service behind a login uses it; (2) submit the access-request form with your advisor as
+sponsor; (3) when the confirmation email arrives, log in once with your password to confirm the
+account is live (`ssh <netid>@amarel.rutgers.edu`, VPN on); (4) continue with 2.2.
+
+Your home directory is small and backed up. `/scratch/<netid>` is large, fast, not backed up and
+subject to OARC's purge policy for old files (the user guide has the current numbers). Everything
+in this repo lives in scratch on purpose; keep anything precious in git or copy it off.
+
+### 2.2 The laptop
+
+1. **The Rutgers VPN.** It is the Cisco Secure Client (formerly AnyConnect). Activate the service
+   once at https://tools.rutgers.edu/manage/services ("Activate VPN"), download the client from the
+   software portal https://software.rutgers.edu/product/3605 (NetID login); details at
+   https://it.rutgers.edu/information-security/security-operations-center/vpn/. The cluster's
+   hostname only resolves through the DNS the VPN provides: if your laptop says *Could not resolve
+   hostname amarel.rutgers.edu* while the rest of the internet works, the VPN has dropped; nothing
+   on the cluster is wrong. `windows\00_check_vpn.bat` tests exactly this.
+2. **An SSH key and a host alias.** `windows\01_setup_ssh.ps1` creates a key if you have none, adds
    a block to `~/.ssh/config` so that `ssh amarel` just works, and prints the one command you run
    yourself to install the public key on the cluster (it asks for your password; the scripts never
    handle passwords). On Linux/macOS do the same by hand:
@@ -62,9 +92,9 @@ You need:
      IdentityFile ~/.ssh/id_ed25519_amarel
      ServerAliveInterval 60
    ```
-4. **On Windows, Git for Windows** (gives you Git Bash, `ssh`, `scp`, `tar`). Note that `rsync` is
+3. **On Windows, Git for Windows** (gives you Git Bash, `ssh`, `scp`, `tar`). Note that `rsync` is
    not in Git Bash; the scripts use `tar` over `ssh` instead.
-5. Optionally **ParaView 6.1.1 on the laptop** (same version as the cluster binary, which matters
+4. Optionally **ParaView 6.1.1 on the laptop** (same version as the cluster binary, which matters
    only if you ever run ParaView in client–server mode).
 
 ## 3. Amarel facts that matter
@@ -176,6 +206,16 @@ if all frequencies are within 0.1 % and all Q within 0.1 % of 2500.
 (`python tests/check_cylinder.py tests/expected` reproduces this table from our stored `eig.csv`.)
 
 If your numbers match to this level the install is good.
+
+Why this test is worth more than it looks: the Q check is the mechanism any loss simulation relies
+on (energy participation × loss tangent → Q), and here it must come out exact because the
+dielectric fills the whole cavity. The frequency errors are all positive because the
+straight-sided mesh approximates the curved wall and makes the cavity slightly stiffer; they
+shrink with refinement, as Palace's own convergence study of this example shows. Our 2026-09-09
+run found all 18 modes (15 requested plus degenerate partners) within +100…+400 ppm, Q = 2500.000
+on every one, degenerate pairs equal to 1e-5, in 43 s on 8 ranks (job 61334332). The files in
+`tests/expected/` are that run: `eig.csv`, `domain-E.csv`, the config, the job log and three
+figures (`cylinder_errors.png`, `cylinder_fields.png`, `cylinder_palace_vs_analytic.png`).
 
 ## 6. Running your own simulation
 

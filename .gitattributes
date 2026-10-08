@@ -1,0 +1,16 @@
+# Scripts that run on the Linux cluster must stay LF even when checked out on Windows,
+# otherwise bash fails with "\r: command not found" after an scp.
+*.sh      text eol=lf
+*.slurm   text eol=lf
+*.sbatch  text eol=lf
+*.py      text eol=lf
+*.json    text eol=lf
+*.csv     text eol=lf
+*.out     text eol=lf
+*.md      text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+# Windows helpers stay CRLF
+*.bat     text eol=crlf
+*.ps1     text eol=crlf
+*.png     binary
